@@ -9,5 +9,6 @@ int main() {
         printf("short(%lu): %d \n", sizeof(s),s);
         printf("int(%lu): %d \n", sizeof(i),i);
         printf("long(%lu): %ld \n", sizeof(l),l);
+
         return 0;
         }

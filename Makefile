@@ -1,13 +1,13 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic
-TARGET = ejercicio3
+TARGET = ejercicio7
 
 all: $(TARGET)
 
-$(TARGET): ejercicio3.o
+$(TARGET): ejercicio7.o
 	$(CC) $(CFLAGS) $^ -o $@
 
-hola.o: ejercicio3.c
+hola.o: ejercicio7.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
