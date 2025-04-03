@@ -7,6 +7,6 @@ int main(){
 
     printf("a + b * c / d: %u \n", a + b * c / d);
     printf("a & b: %x \n", a & b);
-    //etc
+    //etc...
     return 0;
 }
