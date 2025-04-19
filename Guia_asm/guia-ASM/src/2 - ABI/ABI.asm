@@ -99,59 +99,136 @@ alternate_sum_4_using_c_alternative:
 ; uint32_t alternate_sum_8(uint32_t x1, uint32_t x2, uint32_t x3, uint32_t x4, uint32_t x5, uint32_t x6, uint32_t x7, uint32_t x8);
 ; registros y pila: x1[EDI], x2[ESI], x3[EDX], x4[ECX], x5[R8D], x6[R9D], x7[rsp + 16], x8[rsp + 8]
 alternate_sum_8:
-	;prologo
+	; ;prologo
+  ;   push RBP
+  ;   mov RBP, RSP
+
+	; ;suma ;se podria hacer con un call a alternate 4
+  ;  sub EDI, ESI ;x1 = x1 - x2
+  ;  sub EDX, ECX ;x3 = x3 - x4
+  ;  sub R8D, R9D ;x5 = x5 - x6
+   
+  ;  mov ESI, [RSP + 16] ; ESI = x7
+  ;  mov ECX, [RBP + 8] ; EXC = x8
+  ;  sub ESI, ECX 
+
+  ;  add EDI, EDX
+  ;  add R8D, ESI
+  ;  add EDI, R8D
+
+  ;  mov EAX, EDI 
+
+	; ;epilogo
+  ;   pop RBP
+	;   ret
+
+  ;prologo
+    push rbp ; alineado a 16
+    mov rbp,rsp
+	  call alternate_sum_4 ; (x1 - x2 + x3 - x4) en rax (los params ya vienen pasados)
+
+	;preparamos todo para hacer el call que guarde (x5 - x6 + x7 - x8)
+    mov rdi , r8
+    mov rsi, r9
+    mov rdx, [rbp + 16]
+    mov rcx, [rbp + 24]
+    mov r9,rax ; muevo el resultado de la primera suma porque voy a pisar rax
+    call alternate_sum_4
+    add rax,r9
+
+	;epilogo
+    pop rbp
+    ret
+
+
+; SUGERENCIA: investigar uso de instrucciones para convertir enteros a floats y viceversa
+;void product_2_f(uint32_t * destination, uint32_t x1, float f1);
+;registros: destination[rdi], x1[rsi], f1[xmm0]
+product_2_f:
+  ;prologo
     push RBP
     mov RBP, RSP
 
-	;suma
-   sub EDI, ESI ;x1 = x1 - x2
-   sub EDX, ECX ;x3 = x3 - x4
-   sub R8D, R9D ;x5 = x5 - x6
-   
-   mov ESI, [RSP + 16] ; ESI = x7
-   mov ECX, [RBP + 8] ; EXC = x8
-   sub ESI, ECX 
+  ;prod
+  
+  cvtsi2ss XMM1, RSI ;Convert Doubleword Integer to Scalar Single Precision Floating-Point Value
+  mulss XMM0, XMM1 ;multiplico 
+  cvttss2si RAX, XMM0 ;Convert With Truncation Scalar Single Precision Floating-Point Value to Integer
 
-   add EDI, EDX
-   add R8D, ESI
-   add EDI, R8D
-
-   mov EAX, EDI 
+  mov [RDI], EAX ;escribo el contenido del puntero
 
 	;epilogo
     pop RBP
 	  ret
 
 
-; SUGERENCIA: investigar uso de instrucciones para convertir enteros a floats y viceversa
-;void product_2_f(uint32_t * destination, uint32_t x1, float f1);
-;registros: destination[?], x1[?], f1[?]
-product_2_f:
-	ret
-
-
 ;extern void product_9_f(double * destination
 ;, uint32_t x1, float f1, uint32_t x2, float f2, uint32_t x3, float f3, uint32_t x4, float f4
 ;, uint32_t x5, float f5, uint32_t x6, float f6, uint32_t x7, float f7, uint32_t x8, float f8
 ;, uint32_t x9, float f9);
-;registros y pila: destination[rdi], x1[?], f1[?], x2[?], f2[?], x3[?], f3[?], x4[?], f4[?]
-;	, x5[?], f5[?], x6[?], f6[?], x7[?], f7[?], x8[?], f8[?],
-;	, x9[?], f9[?]
+;registros y pila:  destination[rdi], x1[rsi], f1[xmm0], x2[rdx], f2[xmm1], x3[rcx], f3[xmm2], x4[r8], f4[xmm3]
+;	, x5[r9], f5[xmm4], x6[rbp+16], f6[xmm5], x7[rbp+24], f7[xmm6], x8[rbp+32], f8[xmm7],
+;	, x9[rbp + 40], f9[rbp+ 48]
 product_9_f:
 	;prologo
 	push rbp
 	mov rbp, rsp
-
 	;convertimos los flotantes de cada registro xmm en doubles
-	; COMPLETAR
+	cvtss2sd xmm0,xmm0
+	cvtss2sd xmm1,xmm1
+	cvtss2sd xmm2,xmm2
+	cvtss2sd xmm3,xmm3
+	cvtss2sd xmm4,xmm4
+	cvtss2sd xmm5,xmm5
+	cvtss2sd xmm6,xmm6
+	cvtss2sd xmm7,xmm7
+	;me falta f9 que esta en la pila
 
 	;multiplicamos los doubles en xmm0 <- xmm0 * xmm1, xmmo * xmm2 , ...
-	; COMPLETAR
+	mulsd xmm0,xmm1
+	mulsd xmm0,xmm2
+	mulsd xmm0,xmm3
+	mulsd xmm0,xmm4
+	mulsd xmm0,xmm5
+	mulsd xmm0,xmm6
+	mulsd xmm0,xmm7
+
+	;traemos de la pila a f9
+	movss xmm1, [rbp + 48]
+	cvtss2sd xmm1,xmm1
+	mulsd xmm0, xmm1
+
 
 	; convertimos los enteros en doubles y los multiplicamos por xmm0.
-	; COMPLETAR
+	cvtsi2sd xmm1, rsi
+	cvtsi2sd xmm2, rdx
+	cvtsi2sd xmm3, rcx
+	cvtsi2sd xmm4, r8
+	cvtsi2sd xmm5, r9
 
+	mulsd xmm0,xmm1
+	mulsd xmm0,xmm2
+	mulsd xmm0,xmm3
+	mulsd xmm0,xmm4
+	mulsd xmm0,xmm5
+	
+	;traemos de la pila y convertimos los enteros que quedaron
+	mov rsi, [rbp + 16]
+	mov rdx, [rbp + 24]
+	mov rcx, [rbp + 32]
+	mov r8, [rbp + 40]
+	
+	cvtsi2sd xmm1, rsi
+	cvtsi2sd xmm2, rdx
+	cvtsi2sd xmm3, rcx
+	cvtsi2sd xmm4, r8
+	
+	mulsd xmm0,xmm1
+	mulsd xmm0,xmm2
+	mulsd xmm0,xmm3
+	mulsd xmm0,xmm4
+	
+	movsd [rdi], xmm0
 	; epilogo
 	pop rbp
 	ret
-
