@@ -16,8 +16,41 @@ global strLen
 ; ** String **
 
 ; int32_t strCmp(char* a, char* b)
+;a->rsi b->rdi
 strCmp:
-	ret
+	;prologo
+		push rbp
+		mov rbp, rsp
+
+		xor rax, rax ; rax = 0 (caso default para el return)
+
+	.ciclo_igual:
+		mov cl, byte [rsi]
+		mov dl, byte [rdi] 
+
+		cmp cl, 0 ;a[i] ==? '\0' chequeo que no haya terminado el string
+		je .epilogo
+
+		cmp cl, dl ;a[i] ==? b[i]
+		jne .decision
+
+		add rsi, 1 ;avanzo siguiente caracter
+		add rdi, 1
+
+		jmp .ciclo_igual ;si llegue aca es que los caracteres i son iguales
+
+	.decision:
+		cmp cl, dl ;a>?b
+		jg .a_es_mas_grande
+		mov eax, 1 ;a < b → return 1
+		jmp .epilogo
+
+	.a_es_mas_grande:
+		mov eax, -1 ; a > b → return -1
+
+	.epilogo:
+		pop rbp
+		ret
 
 ; char* strClone(char* a)
 ; a->rdi
@@ -28,7 +61,7 @@ strClone:
 
 	;preciclo
 		mov rsi, rdi ;me guardo el puntero original
-		call strlen ;el parametro ya viene pasado (tengo en eax la len)
+		call strLen ;el parametro ya viene pasado (tengo en eax la len)
 
 		add eax, 1 ;le sumo un caracter mas a str len
 		mov rdi, rax ;paso el parametro para el malloc
