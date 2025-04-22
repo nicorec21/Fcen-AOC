@@ -42,7 +42,7 @@ cantidad_total_de_elementos:
 	.ciclo:		
 		mov rcx, [rsi + NODO_OFFSET_LONGITUD] ;rcx = nodo -> longitud
 		add rax, rcx ;ctad_total += nodo->longitud
-		mov rsi, [rsi] ;rsi = nodo->sig
+		mov rsi, [rsi] ;rsi = nodo->next
 
 		cmp rsi, 0 ;si el siguiente puntero no es null repetimos
 		jnz .ciclo
