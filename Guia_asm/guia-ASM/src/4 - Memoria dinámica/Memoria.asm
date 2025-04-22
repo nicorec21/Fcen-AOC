@@ -30,8 +30,27 @@ strDelete:
 strPrint:
 	ret
 
+
 ; uint32_t strLen(char* a)
+; a-> rdi
 strLen:
-	ret
+	;Prologo:
+		push rbp
+		mov rbp, rsp
+
+		xor rax, rax
+
+	.ciclo:
+		mov dl, byte [rdi]
+		cmp dl, 0
+		je .epilogo
+
+		add rax, 1
+		add rdi, 1 ;paso al siguiente caracter
+		jmp .ciclo
+
+	.epilogo:
+		pop rbp
+		ret
 
 
