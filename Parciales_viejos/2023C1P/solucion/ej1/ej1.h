@@ -15,7 +15,7 @@
 //Declaración de estructuras
 //*************************************
 
-#define USE_ASM_IMPL 0
+#define USE_ASM_IMPL 1
 
 typedef struct {
   uint8_t colum_largo;
