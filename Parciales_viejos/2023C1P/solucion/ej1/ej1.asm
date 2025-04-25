@@ -16,8 +16,8 @@ templosClasicos:
         xor rax, rax ; clasicos = 0
         xor r9, r9; i = 0
 
-    ciclo:
-        cmp rax, rsi ; i <? temploArr_len
+    .ciclo:
+        cmp r9, rsi ; i <? temploArr_len
         jl .epilogo 
 
         xor rcx, rcx
