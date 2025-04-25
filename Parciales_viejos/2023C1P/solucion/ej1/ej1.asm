@@ -18,7 +18,7 @@ templosClasicos:
 
     ciclo:
         cmp rax, rsi ; i <? temploArr_len
-        jl .fin 
+        jl .epilogo 
 
         xor rcx, rcx
         xor rdx, rdx
@@ -36,6 +36,7 @@ templosClasicos:
         jne .ciclo
 
         inc rax ;clasicos++
+        jmp .ciclo ;y vuelvo al ciclo
 
     .epilogo:
         pop rbp
