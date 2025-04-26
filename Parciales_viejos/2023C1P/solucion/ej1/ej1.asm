@@ -11,8 +11,7 @@ templosClasicos:
     .prologo:
         push rbp
         mov rbp, rsp
-
-
+        
     .preciclo:
         push rdi
         push rsi ;preservo los parametros originales antes del call (pila alineada)
@@ -39,8 +38,8 @@ templosClasicos:
         xor rcx, rcx
         xor rdx, rdx
 
-        mov cl, [rdi] ; cl=temploarr[i].clarga
-        mov dl, [rdi + 16] ;dl=temploarr[i].ccorta
+        mov cl, byte [rdi] ; cl=temploarr[i].clarga
+        mov dl, byte [rdi + 16] ;dl=temploarr[i].ccorta
 
         inc r9 ;i++
         add rdi, 24 ;paso al sig templo
@@ -53,7 +52,14 @@ templosClasicos:
         jne .ciclo
 
         mov rcx, [rdi] ;rcx=temploArr[i]
-        mov [rax + r10 * 24], rcx  ;templos_clasicos_arr[j] = temploArr[i];
+        mov [rax + r10 * 24], rcx  ;templos_clasicos_arr[j] = temploArr[i]; (primeros 8bytes)
+
+        mov rcx, [rdi + 8]
+        mov[rax + r10 * 24 + 8], rcx ;(segundos 8bytes)
+
+        mov rcx, [rdi + 16]
+        mov[rax + r10 * 24 + 16], rcx ; (terceros 8bytes)
+
         inc r10 ;j++
         jmp .ciclo ;y vuelvo al ciclo
 
@@ -81,14 +87,15 @@ cuantosTemplosClasicos:
         xor rcx, rcx
         xor rdx, rdx
 
-        mov cl, [rdi] ; cl=temploarr[i].clarga
-        mov dl, [rdi + 16] ;dl=temploarr[i].ccorta
+        mov cl, byte [rdi] ; cl=temploarr[i].clarga
+        mov dl, byte [rdi + 16] ;dl=temploarr[i].ccorta
 
         inc r9 ;i++
         add rdi, 24 ;paso al sig templo
 
     .cuenta:
         shl dl, 1 ;dl=temploarr[i].ccorta * 2
+        ;imul rdx, 2
         add dl, 1 ;dl=temploarr[i].ccorta + 1
 
         cmp cl, dl ;cl == ? dl
