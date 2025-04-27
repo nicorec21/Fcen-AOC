@@ -88,11 +88,74 @@ strArrayAddLast:
         ret
 
 
-; void  strArraySwap(str_array_t* a, uint8_t i, uint8_t j)
+;void  strArraySwap(str_array_t* a, uint8_t i, uint8_t j)
+;rdi- a
+;rsi - i (sil)
+;rdx - j (dl)
 strArraySwap:
+    ;prologo:
+        push rbp
+        mov rbp, rsp
+        xor rcx, rcx
+
+        movzx rcx, byte[rdi] ;rcx = (uint8_t)a->size
+        cmp sil, cl ;i >? a->size
+        ja .epilogo
+        cmp dl, cl ;j>?a->size
+        ja .epilogo 
+
+        mov r8, [rdi + 8] ;r8 = a->data (puntero a strings)
+
+        movzx rcx, sil ; extiendo a 64 el i en rcx
+        mov r9, [r8 + rcx*8 ] ;r9=a->data[i] (puntero al string i)
+
+        movzx rcx, dl ;extiendo a 64 el j en rcx
+        mov r10, [r8 + rcx*8] ;r10=a->data[j] (puntero al string j)
+
+        movzx rcx, sil  ;extiendo a 64 el i en rcx (de nuevo)
+        mov [r8 + rcx*8], r10 ; data[i] = puntero a string j
+
+        movzx rcx, dl           ; j de nuevo
+        mov [r8 + rcx*8], r9    ; data[j] = puntero a string i
+
+    .epilogo:
+        pop rbp
+        ret
+
 
 
 ; void  strArrayDelete(str_array_t* a)
+;;rdi- a
 strArrayDelete:
+    ;prologo:
+        push rbp
+        mov rbp, rsp
+        
+    .preciclo:
+        xor rcx, rcx;i=0
+        movzx rdx, byte[rdi] ;rdx = (uint8_t)a->size
 
+        mov r9, rdi ;me guardo en r9 una copia de rdi
+        mov r8, [r9 + 8] ;r8 = a->data
+
+    .ciclo:
+        cmp rcx, rdx ;i ==? a->size
+        je .fin
+
+        mov rdi, [r8 + rcx*8] ;rdi=a->data[i]
+        call free ;parametro pasado
+        inc rcx ;i++
+
+        jmp .ciclo
+
+    .fin:
+        mov rdi, r8 ;free a->data
+        call free
+
+        mov rdi, r9 ;free rd a (el struct)
+        call free
+
+    .epilogo:
+        pop rbp
+        ret
 
