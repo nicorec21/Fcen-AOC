@@ -8,6 +8,9 @@ extern malloc
 extern calloc
 extern free
 
+extern strdup ;vale usar esta???S
+
+
 ;########### SECCION DE DATOS
 section .data
 
@@ -77,11 +80,18 @@ strArrayAddLast:
         cmp rcx, rdx
         jae .epilogo ;a->size >=) a->capacity (Jump if Above or Equal)
 
-        mov rdx, [rdi + 8] ;rdx = a->data (array de strings)
-        mov [rdx + rcx*8], rsi ;a->data[i] = data (que me pasaron por param)
+        mov r8, [rdi + 8] ; r8 = a->data (puntero a array de strings)
+
+        mov r9, rdi ;guardo una copia de a porq lo voy a pisar
+
+        mov rdi, rsi ;le paso a strdup el string como param
+        call strdup ;(hace strlen,malloc y strcpy internamente)
+        ;En rax tengo el puntero al string copiado
+
+        mov [r8 + rcx*8], rax ;a->data[size] = data (que me pasaron por param)
 
         inc rcx ;size++
-        mov byte [rdi], cl ;a->size++ actualizado en el struct
+        mov byte [r9], cl ;a->size++ actualizado en el struct
     
     ;epilogo:
         pop rbp

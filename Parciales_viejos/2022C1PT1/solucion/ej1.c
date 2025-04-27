@@ -56,7 +56,7 @@ char* strArrayGet(str_array_t* a, uint8_t i) {
 //         return; //no hago nada
 //     }
     
-//     strings[ocupados] = data;
+//     strings[ocupados] = strdup(data);
 //     a->size++; //actualizo size
 // }
 
