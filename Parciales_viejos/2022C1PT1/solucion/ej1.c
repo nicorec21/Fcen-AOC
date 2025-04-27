@@ -33,50 +33,50 @@ char* strArrayGet(str_array_t* a, uint8_t i) {
     return ret;
 }
 
-str_array_t* strArrayNew(uint8_t capacity){
-    str_array_t* new_str_arr = malloc(sizeof(str_array_t));
-    new_str_arr->size = 0;
-    new_str_arr->capacity = capacity;
-    //new_str_arr->data = malloc(sizeof(char*) * capacity);
-    new_str_arr->data = calloc(capacity, sizeof(char*)); //los inicializa en 0
-    //DATA ES UN ARRAY DE PUNTEROS A STRINGS (STRING = PUNTERO A CHAR)
-    return new_str_arr;
-}
+// str_array_t* strArrayNew(uint8_t capacity){
+//     str_array_t* new_str_arr = malloc(sizeof(str_array_t));
+//     new_str_arr->size = 0;
+//     new_str_arr->capacity = capacity;
+//     //new_str_arr->data = malloc(sizeof(char*) * capacity);
+//     new_str_arr->data = calloc(capacity, sizeof(char*)); //los inicializa en 0
+//     //DATA ES UN ARRAY DE PUNTEROS A STRINGS (STRING = PUNTERO A CHAR)
+//     return new_str_arr;
+// }
 
-uint8_t  strArrayGetSize(str_array_t* a){
-    uint8_t ocupados = a->size;
-    return ocupados;
-}
+// uint8_t  strArrayGetSize(str_array_t* a){
+//     uint8_t ocupados = a->size;
+//     return ocupados;
+// }
 
-void  strArrayAddLast(str_array_t* a, char* data){
-    uint8_t ocupados = a->size;
-    char** strings = a->data;
+// void  strArrayAddLast(str_array_t* a, char* data){
+//     uint8_t ocupados = a->size;
+//     char** strings = a->data;
 
-    if(ocupados + 1 == a->capacity){
-        return; //no hago nada
-    }
+//     if(ocupados + 1 == a->capacity){
+//         return; //no hago nada
+//     }
     
-    strings[ocupados] = data;
-    a->size++; //actualizo size
-}
+//     strings[ocupados] = data;
+//     a->size++; //actualizo size
+// }
 
-void  strArraySwap(str_array_t* a, uint8_t i, uint8_t j){
-    if(i >= a->size ||  j >= a->size){
-        return;
-    }
-    char* temp = a->data[i];
-    a->data[i] = a->data[j];
-    a->data[j] = temp;
+// void  strArraySwap(str_array_t* a, uint8_t i, uint8_t j){
+//     if(i >= a->size ||  j >= a->size){
+//         return;
+//     }
+//     char* temp = a->data[i];
+//     a->data[i] = a->data[j];
+//     a->data[j] = temp;
 
-}
+// }
 
-void  strArrayDelete(str_array_t* a){
-    for(uint8_t i = 0; i< a->size; i++){ //hasta size o hasta capacity??
-        free(a->data[i]);
-    }
-    free(a->data);
-    free(a);
-}
+// void  strArrayDelete(str_array_t* a){
+//     for(uint8_t i = 0; i< a->size; i++){ //hasta size o hasta capacity??
+//         free(a->data[i]);
+//     }
+//     free(a->data);
+//     free(a);
+// }
 // // IMPLEMENTACION PROPIA DE strdup si no está
 // char* strdup(const char* s) {
 //     size_t len = strlen(s) + 1;
