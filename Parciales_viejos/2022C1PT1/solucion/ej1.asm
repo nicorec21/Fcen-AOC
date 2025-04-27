@@ -59,7 +59,7 @@ strArrayGetSize:
         push rbp
         mov rbp, rsp
 
-        movzx byte rax, [rdi] ;leo el size y extiendo (el size queda en los 8 bits mas bajos)
+        movzx rax, byte [rdi] ;leo el size y extiendo (el size queda en los 8 bits mas bajos)
 
    ;epilogo:
         pop rbp
@@ -93,7 +93,7 @@ strArrayAddLast:
         inc rcx ;size++
         mov byte [r9], cl ;a->size++ actualizado en el struct
     
-    ;epilogo:
+    .epilogo:
         pop rbp
         ret
 
