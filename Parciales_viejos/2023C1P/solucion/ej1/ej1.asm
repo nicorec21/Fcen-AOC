@@ -94,11 +94,16 @@ cuantosTemplosClasicos:
         add rdi, 24 ;paso al sig templo
 
     .cuenta:
-        shl dl, 1 ;dl=temploarr[i].ccorta * 2
-        ;imul rdx, 2
-        add dl, 1 ;dl=temploarr[i].ccorta + 1
+        ; shl dl, 1 ;dl=temploarr[i].ccorta * 2
+        ; add dl, 1 ;dl=temploarr[i].ccorta + 1
 
-        cmp cl, dl ;cl == ? dl
+        ; cmp cl, dl ;cl == ? dl
+        ; jne .ciclo
+
+        shl rdx, 1
+        add rdx, 1
+
+        cmp rcx, rdx
         jne .ciclo
 
         inc rax ;clasicos++
