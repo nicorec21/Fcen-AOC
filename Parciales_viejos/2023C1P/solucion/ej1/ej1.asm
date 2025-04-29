@@ -1,6 +1,8 @@
 global templosClasicos
 global cuantosTemplosClasicos
 
+extern malloc
+
 ;########### SECCION DE TEXTO (PROGRAMA)
 section .text
 
@@ -12,6 +14,9 @@ templosClasicos:
         push rbp
         mov rbp, rsp
         
+        push r14
+        push r15
+
     .preciclo:
         push rdi
         push rsi ;preservo los parametros originales antes del call (pila alineada)
@@ -41,29 +46,40 @@ templosClasicos:
         mov cl, byte [rdi] ; cl=temploarr[i].clarga
         mov dl, byte [rdi + 16] ;dl=temploarr[i].ccorta
 
-        inc r9 ;i++
-        add rdi, 24 ;paso al sig templo
 
     .cuenta:
-        shl dl, 1 ;dl=temploarr[i].ccorta * 2
-        add dl, 1 ;dl=temploarr[i].ccorta + 1
+    
+        shl rdx, 1 ;dl=temploarr[i].ccorta * 2
+        add rdx, 1 ;dl=temploarr[i].ccorta + 1
 
-        cmp cl, dl ;cl == ? dl
-        jne .ciclo
+        cmp rcx, rdx ;cl == ? dl
+        jne .next_templo
 
         mov rcx, [rdi] ;rcx=temploArr[i]
-        mov [rax + r10 * 24], rcx  ;templos_clasicos_arr[j] = temploArr[i]; (primeros 8bytes)
+
+        mov r14, r10
+        imul r14, 24 ;multiplico por los bytes de la estructura
+
+        mov [rax + r14], rcx  ;templos_clasicos_arr[j] = temploArr[i]; (primeros 8bytes)
 
         mov rcx, [rdi + 8]
-        mov[rax + r10 * 24 + 8], rcx ;(segundos 8bytes)
+        mov [rax + r14  + 8], rcx ;(segundos 8bytes)
 
         mov rcx, [rdi + 16]
-        mov[rax + r10 * 24 + 16], rcx ; (terceros 8bytes)
+        mov [rax + r14 + 16], rcx ; (terceros 8bytes)
 
         inc r10 ;j++
-        jmp .ciclo ;y vuelvo al ciclo
+
+    .next_templo:
+
+        inc r9 ;i++
+        add rdi, 24 ;paso al sig templo
+        jmp .ciclo
+
 
      .epilogo:
+        pop r15
+        pop r14
         pop rbp
         ret
 
