@@ -52,7 +52,7 @@ char* strArrayGet(str_array_t* a, uint8_t i) {
 //     uint8_t ocupados = a->size;
 //     char** strings = a->data;
 
-//     if(ocupados + 1 == a->capacity){
+//     if(ocupados == a->capacity){
 //         return; //no hago nada
 //     }
     

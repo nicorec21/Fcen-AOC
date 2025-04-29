@@ -95,7 +95,7 @@ strArrayAddLast:
         mov r15, rdi ;guardo una copia de a porq lo voy a pisar
 
         mov rdi, rsi ;le paso a strdup el string como param
-        call strClone ;(hace strlen,malloc y strcpy internamente)
+        call strdup ;(hace strlen,malloc y strcpy internamente)
         ;En rax tengo el puntero al string copiado
 
         mov [r13 + r14*8], rax ;a->data[size] = data (que me pasaron por param)
