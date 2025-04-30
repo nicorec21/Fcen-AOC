@@ -14,7 +14,7 @@ TRUE  EQU 1
 ; Funciones a implementar:
 ;   - es_indice_ordenado
 global EJERCICIO_1A_HECHO
-EJERCICIO_1A_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
+EJERCICIO_1A_HECHO: db TRUE ; Cambiar por `TRUE` para correr los tests.
 
 ; Marca el ejercicio 1B como hecho (`true`) o pendiente (`false`).
 ;
@@ -47,16 +47,77 @@ EJERCICIO_1B_HECHO: db FALSE ; Cambiar por `TRUE` para correr los tests.
 ;;   de verificar que el orden sea estable.
 
 global es_indice_ordenado
+; r/rdi = item_t**     inventario
+; r/rsi = uint16_t*    indice
+; r/rdx (dx) = uint16_t     tamanio
+; r/rcx (f) = comparador_t comparador
 es_indice_ordenado:
-	; Te recomendamos llenar una tablita acá con cada parámetro y su
-	; ubicación según la convención de llamada. Prestá atención a qué
-	; valores son de 64 bits y qué valores son de 32 bits o 8 bits.
-	;
-	; r/m64 = item_t**     inventario
-	; r/m64 = uint16_t*    indice
-	; r/m16 = uint16_t     tamanio
-	; r/m64 = comparador_t comparador
-		ret
+		;prologo:
+			push rbp
+			mov rbp, rsp
+			push r15
+			push r14
+			push r13
+			push r12 ;pusheo no volatiles para tener regs de sobra (queda alineada la pila)
+
+			xor r10, r10 ;i=0
+			xor r11, r11
+
+			movzx rdx, dx ;extiendo dx a 8bytes
+			dec rdx ;tamanio-1
+
+		.ciclo:
+			cmp r10, rdx ;i<?tamanio
+			je .epilogo
+
+		;if:
+
+			movzx r15, word [rsi + r10*2]; r15 = indice[i]
+			mov r14, [rdi + r15*8]; r14 = inventario[indice[i]] = a
+
+			movzx r13, word [rsi + (r10 + 1) *2 ] ; r13 = indice[i+1]
+			mov r12, [rdi + r13*8]; r12 = inventario[indice[i+1]] = b
+
+			push rdi
+			push rsi ;guardo los params orginales porq los voy a pisar (la pila sigue alineada)
+			push rdx
+			push rcx
+			push r10 ;guardo mi contador porq es volatil
+			push r11 ;alineo pila
+
+			mov rdi, r14 ;paso los parametros
+			mov rsi, r12
+			call rcx ;comparador(a,b)
+
+			pop r11
+			pop r10
+			pop rcx
+			pop rdx
+			pop rsi
+			pop rdi ;restauro pila
+
+			inc r10 ;i++
+
+			cmp rax, 0
+			jne .ciclo 
+
+		.epilogo:
+			pop r12
+			pop r13
+			pop r14
+			pop r15
+			pop rbp
+			ret
+
+
+
+
+
+
+
+
+
+
 
 ;; Dado un inventario y una vista, crear un nuevo inventario que mantenga el
 ;; orden descrito por la misma.
