@@ -14,7 +14,7 @@
 
 ---
 
-## 🧠 Valores de retorno
+## 🧐 Valores de retorno
 
 | Tipo de dato      | Registro de retorno |
 |-------------------|---------------------|
@@ -24,19 +24,19 @@
 
 ---
 
-## 💾 Registros: preservación (caller vs callee save)
+## 📂 Registros: preservación (caller vs callee save)
 
-### Caller-save (⚠️ se pueden pisar con `call`):
+### Caller-save (se pueden pisar con `call`):
 
 - `rax`, `rcx`, `rdx`, `rsi`, `rdi`, `r8`, `r9`, `r10`, `r11`
 
-### Callee-save (✅ si los usás, tenés que preservarlos):
+### Callee-save (si los usás, tenés que preservarlos):
 
 - `rbx`, `rbp`, `r12`, `r13`, `r14`, `r15`
 
 ---
 
-## 📐 Subregistros por tamaño
+## 🖐️ Subregistros por tamaño
 
 | Registro base | 64 bits | 32 bits | 16 bits | 8 bits bajo |
 |---------------|---------|---------|---------|-------------|
@@ -57,8 +57,63 @@
 
 ---
 
-## 🛠️ Operaciones útiles
+## 🛠️ Operaciones úTiles frecuentes en ASM
 
-- **Extender `uint16_t` a 64 bits**:  
-  ```nasm
-  movzx rax, word [rsi + rdx*2]
+### Acceder a un índice de array:
+```asm
+movzx rax, word [rsi + rdx*2]    ; acceder a indice[i] de uint16_t*
+mov rbx, [rdi + rax*8]           ; acceder a inventario[indice[i]] de item_t**
+```
+
+### Copiar un puntero a resultado:
+```asm
+mov [r14 + r13*8], rbx           ; resultado[i] = inventario[indice[i]]
+```
+
+### Copiar una estructura de 28 bytes (ej: item_t):
+```asm
+mov rax, [rsi]       ; 8 bytes
+mov [rdi], rax
+mov rax, [rsi+8]     ; siguiente 8
+mov [rdi+8], rax
+mov rax, [rsi+16]    ; siguiente 8
+mov [rdi+16], rax
+mov ax, [rsi+24]     ; últimos 2 bytes
+mov [rdi+24], ax
+```
+
+### Comparar resultado booleano:
+```asm
+call rcx
+; valor devuelto está en al
+
+; chequear si es falso
+test al, al
+jz .no_ordenado
+```
+
+### Multiplicar por potencias de 2
+```asm
+shl rax, 1 ; x2
+shl rax, 2 ; x4
+shl rax, 3 ; x8
+shl rax, 4 ; x16
+```
+
+---
+
+## 📊 Convención de pila (stack frame)
+
+```
+| argumento 7+       | <- rsp al entrar (si hay más de 6 args)
+| ------------------|
+| return address     |
+| rbp (viejo)        | <- rbp (marco de pila)
+| variables locales  |
+| registros guardados|
+```
+
+
+
+> Hecho por Nico con ayuda de ChatGPT 😎
+
