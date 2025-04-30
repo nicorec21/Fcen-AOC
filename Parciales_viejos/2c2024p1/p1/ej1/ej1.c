@@ -43,7 +43,7 @@ item_t** indice_a_inventario(item_t** inventario, uint16_t* indice, uint16_t tam
 	for(uint16_t i = 0; i<tamanio; i++){
 		resultado[i] = inventario[indice[i]];
 	}
-
+	//printf("sizeof(item_t): %zu\n", sizeof(item_t));
 	return resultado;
 }
 // ¿Cuánta memoria hay que pedir para el resultado?
