@@ -112,7 +112,165 @@ shl rax, 4 ; x16
 | variables locales  |
 | registros guardados|
 ```
+# 🐞 Guía rápida de GDB
 
+## 📌 Iniciar GDB
+```bash
+gdb ./mi_programa
+gdb ./mi_programa archivo_de_prueba
+```
+
+## 🟢 Comandos esenciales
+```bash
+run             # Ejecuta el programa
+start           # Comienza ejecución y se frena en main
+next / n        # Ejecuta siguiente línea (salta funciones)
+step / s        # Entra en función si hay una llamada
+continue / c    # Continúa hasta próximo breakpoint
+finish          # Ejecuta hasta salir de la función actual
+quit / q        # Salir de GDB
+```
+
+## ⛳ Breakpoints
+```bash
+break main
+break archivo.c:42
+break funcion
+delete [número]      # Borra breakpoint
+info breakpoints     # Lista breakpoints
+```
+
+## 🔍 Inspeccionar valores
+```bash
+print x              # Muestra el valor de x
+print/x x            # Muestra en hexadecimal
+print/d x            # Muestra en decimal
+print/c x            # Muestra como caracter
+display x            # Muestra el valor en cada paso automáticamente
+undisplay n          # Deja de mostrar ese display
+```
+
+## 🧠 Estructuras y punteros
+```bash
+print *ptr           # Muestra la estructura apuntada por ptr
+print ptr->campo     # Campo dentro de struct
+print arr[i]         # Elemento i de un array
+ptype variable       # Tipo de la variable
+```
+
+## 📦 Memoria y punteros
+```bash
+x/4xg ptr            # Examina 4 valores de 8 bytes en hex desde ptr
+x/s ptr              # Muestra string en ptr
+x/20xb &var          # Muestra 20 bytes desde dirección de var
+```
+
+## 📄 Ver código fuente
+```bash
+list                 # Muestra las líneas del archivo fuente
+list 20              # Muestra desde línea 20
+list funcion         # Muestra el código de la función
+```
+
+## 🧮 Registros (ASM)
+```bash
+info registers       # Muestra todos los registros
+print $rax           # Valor de un registro
+```
+
+## 🧱 Stack y backtrace
+```bash
+backtrace            # Muestra el call stack
+frame n              # Cambia a otro frame
+info frame           # Muestra info del frame actual
+```
+
+## 💡 Tips útiles
+- Siempre compilar con `-g` para que GDB tenga símbolos:
+```bash
+gcc -g programa.c -o programa
+```
+
+- Podés usar expresiones como en C:
+```bash
+print a + b
+print strcmp(str1, str2)
+```
+```
+
+### 🔹 Código en `main.c`
+```c
+int main() {
+    templo t1 = { 8, "Partenón", 3 };
+    return 0;
+}
+```
+
+### 🔹 Compilar con símbolos
+```bash
+gcc -g main.c -o templo_test
+```
+
+### 🔹 GDB paso a paso
+```gdb
+gdb ./templo_test
+break main
+run
+print t1                     # Muestra todos los campos
+print t1.colum_largo         # Campo específico
+print t1.colum_corto
+print t1.nombre              # Dirección del string
+x/s t1.nombre                # Muestra el contenido del string
+```
+
+---
+
+## 🧪 Ejemplo 2: Array de estructuras `templo`
+
+### 🔹 Código en `main.c`
+```c
+int main() {
+    templo templos[2] = {
+        { 8, "Partenón", 3 },
+        { 6, "Erecteion", 2 }
+    };
+    return 0;
+}
+```
+
+### 🔹 GDB paso a paso
+```gdb
+gdb ./templo_test
+break main
+run
+print templos[0]             # Muestra el primer struct
+print templos[1]             # Muestra el segundo struct
+print templos[1].nombre
+x/s templos[1].nombre
+```
+
+---
+
+## 🧪 Ejemplo 3 (Bonus): Puntero a estructura
+
+### 🔹 Código en `main.c`
+```c
+int main() {
+    templo t = { 9, "Templo de Zeus", 4 };
+    templo *ptr = &t;
+    return 0;
+}
+```
+
+### 🔹 GDB paso a paso
+```gdb
+gdb ./templo_test
+break main
+run
+print *ptr                   # Muestra todos los campos de la estructura
+print ptr->nombre            # Dirección del nombre
+x/s ptr->nombre              # String apuntado por el campo nombre
+```
 
 
 > Hecho por Nico con ayuda de ChatGPT 😎
