@@ -7,8 +7,14 @@
  * - El `sum` más grande de la lista vacía (`NULL`) es 0.
  */
 uint32_t proyecto_mas_dificil(lista_t* lista) {
-	/* COMPLETAR */
-	return 0; // BORRAR
+    uint32_t max_sum = 0;
+    while (lista != NULL) {
+        if (lista->sum > max_sum) {
+            max_sum = lista->sum;
+        }
+        lista = lista->next;
+    }
+    return max_sum;
 }
 
 /**
@@ -40,9 +46,14 @@ void marcar_tarea_completada(lista_t* lista, size_t index) {
  * - La longitud de `NULL` es 0
  */
 uint64_t lista_len(lista_t* lista) {
-	/* OPCIONAL: Completar si se usa el esquema recomendado por la cátedra */
-	return 0; // BORRAR
+    uint64_t count = 0;
+    while (lista != NULL) {
+        count++;
+        lista = lista->next;
+    }
+    return count;
 }
+
 
 /**
  * Dado un array de `size` enteros de 32 bits sin signo devuelve la cantidad de
@@ -51,8 +62,13 @@ uint64_t lista_len(lista_t* lista) {
  * - Un array de tamaño 0 tiene 0 ceros.
  */
 uint64_t tareas_completadas(uint32_t* array, size_t size) {
-	/* OPCIONAL: Completar si se usa el esquema recomendado por la cátedra */
-	return 0; // BORRAR
+	uint64_t count = 0;
+	for(uint64_t i = 0; i < size; i++){
+		if(array[i] == 0){
+			count++;
+		}
+	}
+	return count;
 }
 
 /**
