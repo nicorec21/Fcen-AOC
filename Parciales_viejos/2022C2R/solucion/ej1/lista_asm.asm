@@ -1,11 +1,10 @@
-%define OFFSET_NEXT  0
-%define OFFSET_SUM   8
-%define OFFSET_SIZE  16
-%define OFFSET_ARRAY 24
-%define SIZE_LISTA 32
+; %define OFFSET_NEXT  ??
+; %define OFFSET_SUM   ??
+; %define OFFSET_SIZE  ??
+; %define OFFSET_ARRAY ??
 
 BITS 64
-
+extern calloc
 section .text
 
 
@@ -14,34 +13,46 @@ section .text
 ; Dada una lista enlazada de proyectos devuelve el `sum` más grande de ésta.
 ;
 ; - El `sum` más grande de la lista vacía (`NULL`) es 0.
-;
+; lista rdi 
 global proyecto_mas_dificil
-;rdi -> lista_t*
 proyecto_mas_dificil:
-	;prologo:
-		push rbp
-		mov rbp, rsp
+	push rbp 
+	mov rbp, rsp 
+	
+	push r12
+	push r13
+	push r14
+	push r15
 
-		xor rax, rax ;max_sum=0
+	xor r12,r12 ;contador 
+	xor r13, r13;maximo 
+	xor r14, r14 ;lista
 
-	.ciclo:
-		cmp rdi, 0 ;lista ==? NULL
-		je .epilogo ; si lista == NULL, terminamos
+	mov r14, rdi ;lista 
+.loop: 
+	cmp r14, 0
+	je .fin
+	xor r15, r15
+	mov r15d, [r14 + 8] ;sum
+	cmp r15, r13 
+	jnle .cuenta
+	mov r14, [r14] 
+	jmp .loop
+.cuenta:
+	xor r13,r13
+	mov r13, r15
+	mov r14, [r14] 
+	jmp .loop
 
-		mov rsi, [rdi + OFFSET_SUM] ;rsi = lista->sum
 
-		cmp rsi, rax ;lista->sum ≤ max_sum (unsigned)
-		jbe .siguiente_nodo ;below or equal rsi<=rax
-
-		mov rax, rsi ;max_sum = lista->sum;
-
-	.siguiente_nodo:
-		mov rdi, [rdi + OFFSET_NEXT];lista = lista->next
-		jmp .ciclo
-
-	.epilogo:
-		pop rbp
-		ret
+.fin:
+	mov rax, r13
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
+	ret
 
 ; void tarea_completada(lista_t*, size_t)
 ;
@@ -51,46 +62,55 @@ proyecto_mas_dificil:
 ; - La implementación debe "saltearse" a los proyectos sin tareas
 ; - Se puede asumir que el índice siempre es válido
 ; - Se debe actualizar el `sum` del nodo actualizado de la lista
-;
+;rdi liata, index rsi
 global marcar_tarea_completada
-;rdi->lista_t*
-;rsi->index
 marcar_tarea_completada:
-	;prologo:
-		push rbp
-		mov rbp, rsp
+	push rbp 
+	mov rbp, rsp 
+	
+	push r12
+	push r13
+	push r14
+	push r15
+	push rbx
+	xor r12,r12 ;contador 
+	xor r13, r13;index
+	xor r14, r14 ;lista
 
-		xor r9, r9 ;curr_i = 0
+	mov r14, rdi
+	mov r13, rsi
+.loop:
+	cmp r14, 0
+	je .fin
+	xor r15, r15
+	xor rbx, rbx 
+	mov r15, [r14 + 16] ; size
+	add rbx, r12
+	add rbx, r15
+	cmp rbx, r13
+	jnle .fin 
+	add r12, r15
+	mov r14, [r14]
+	jmp .loop 
 
-	.ciclo:
-		cmp rdi, 0 ;lista ==? NULL
-		je .saltear_while ; si lista == NULL, seguimos
-
-		mov r10, r9 ;r10 = curr_i
-		add r10, [rdi + OFFSET_SIZE] ;r10 = rcurr_i + lista->size
-		cmp r10, rsi; curr_i + lista->size <=? index
-		jbe .saltear_while
-
-		add r9, [rdi + OFFSET_SIZE] ;curr_i += lista->size;
-		mov rdi, [rdi] ;lista->next
-
-	.saltear_while:
-		cmp rdi, 0 ;lista ==? NULL
-		je .epilogo
-
-	;fin:
-		sub rsi, r9 ;index -= curr_i;
-		mov r10, rsi ;copio el index
-		shl r10, 2 ;r10 *4 (tamaño de uint32 cada tarea)
-
-		mov r11, [rdi + OFFSET_ARRAY] ;r11 = lista->array
-		mov ecx, [r11 + r10]  ;ecx = lista->array[index]
-		sub [rdi + OFFSET_SUM], ecx ;lista->sum -= lista->array[index];
-		mov DWORD [r11 + r10], 0 ;lista->array[index] = 0;
-
-	.epilogo:
-		pop rbp
-		ret
+.fin:
+	cmp r14, 0
+	je .fin
+	sub r13, r12
+	xor r15, r15
+	mov r15, [r14 + 8] ; sum
+	mov rdx, [r14 + 24] ; array
+	mov rcx, [rdx + r13 * 4] ; array[index]
+	sub r15, rcx
+	mov [r14 + 8], r15
+	mov word [rdx + r13 * 4], 0
+	pop rbx
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
+	ret
 
 ; uint64_t* tareas_completadas_por_proyecto(lista_t*)
 ;
@@ -106,7 +126,56 @@ marcar_tarea_completada:
 ;
 global tareas_completadas_por_proyecto
 tareas_completadas_por_proyecto:
-	; COMPLETAR
+	push rbp 
+	mov rbp, rsp 
+	
+	push r12
+	push r13
+	push r14
+	push r15
+	push rbx
+	push rdi
+	push rsi
+	push rcx  
+	
+	xor r12, r12;contador
+	xor r13, r13;tamaño
+	xor r14,r14;lista
+	xor r15, r15;resultado 
+	
+	mov r14,rdi
+	call lista_len
+	mov r13, rax
+	mov rbx, r13
+	mov rdi, rbx
+	mov rsi, 8
+	call calloc
+	mov r15, rax
+.loop: 
+	cmp r12, r13
+	je .fin
+	xor rdi, rdi
+	xor rsi, rsi  
+	xor rcx, rcx 
+	mov rdi, [r14 + 24] ;array
+	mov rsi, [r14 + 16] ;size 
+	call tareas_completadas
+	mov [r15 + r12 * 8],rax
+	mov r14, [r14]
+	inc r12
+	jmp .loop 
+.fin:
+	xor rax, rax
+	mov rax, r15
+	pop rcx
+	pop rsi
+	pop rdi 
+	pop rbx
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
 	ret
 
 ; uint64_t lista_len(lista_t* lista)
@@ -114,9 +183,29 @@ tareas_completadas_por_proyecto:
 ; Dada una lista enlazada devuelve su longitud.
 ;
 ; - La longitud de `NULL` es 0
-;
+; rdi lista
 lista_len:
-	; OPCIONAL: Completar si se usa el esquema recomendado por la cátedra
+	push rbp 
+	mov rbp, rsp
+	push r12
+	push r13
+	
+	xor r13, r13
+	xor r12, r12
+
+	mov r12, rdi ;lista
+.loop:
+	cmp r12, 0
+	je .fin 
+	inc r13 
+	mov r12, [r12]
+	jmp .loop 
+
+.fin:
+	mov rax, r13
+	pop r13
+	pop r12
+	pop rbp 
 	ret
 
 ; uint64_t tareas_completadas(uint32_t* array, size_t size) {
@@ -126,4 +215,48 @@ lista_len:
 ;
 ; - Un array de tamaño 0 tiene 0 ceros.
 tareas_completadas:
-	; OPCIONAL: Completar si se usa el esquema recomendado por la cátedra
+	push rbp
+	mov rbp, rsp 
+	push r12
+	push r13
+	push r14
+	push r15
+	push rbx
+	push rdi 
+	push rsi 
+	push rcx 
+	
+	xor r12, r12;completadas
+	xor r13, r13;contador
+	xor r14, r14;lista
+	xor r15, r15;tamaño
+	mov r14, rdi
+	mov r15, rsi 
+	cmp r14, 0
+	je .fin 
+.loop:
+	cmp r13, r15
+	je .fin
+	xor rbx, rbx 
+	mov ebx, [r14 + r13 * 4]
+	cmp ebx, 0
+	je .cuenta 
+	inc r13
+	jmp .loop 
+.cuenta:
+	inc r12
+	inc r13
+	jmp .loop 
+.fin:
+	xor rax, rax
+	mov rax, r12
+	pop rcx 
+	pop rsi 
+	pop rdi
+	pop rbx
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
+	ret
