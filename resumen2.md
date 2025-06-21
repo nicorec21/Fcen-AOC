@@ -89,3 +89,4 @@ void screen_draw_layout(void) {
   screen_draw_box(0, 0, ROWS, COLS, 178, 0x0A);  // borde decorativo
 }
 ```
+[text](https://docs.google.com/document/d/1j2fV9WGEdfMBcaU-gSZxLqo0OzWDIQ05SVzd28CebZM/edit?tab=t.0)
