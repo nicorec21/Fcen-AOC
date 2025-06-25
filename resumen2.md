@@ -105,10 +105,8 @@ void* mmu_get_phys_ptr(uint32_t cr3, uint32_t virtual_addr) {
 
     return (void*)(phys_page + offset);
 }
-🧪 Ejemplo de uso
-c
-Copiar
-Editar
+Ejemplo de uso
+```c
 uint32_t cr3 = get_current_task_cr3(); // o el cr3 del kernel
 uint32_t vaddr = 0x07000000;
 
