@@ -89,4 +89,31 @@ void screen_draw_layout(void) {
   screen_draw_box(0, 0, ROWS, COLS, 178, 0x0A);  // borde decorativo
 }
 ```
-[text](https://docs.google.com/document/d/1j2fV9WGEdfMBcaU-gSZxLqo0OzWDIQ05SVzd28CebZM/edit?tab=t.0)
+
+```c
+#include "mmu.h"
+
+void* mmu_get_phys_ptr(uint32_t cr3, uint32_t virtual_addr) {
+    pd_entry_t* pd = CR3_TO_PAGE_DIR(cr3); // puntero al Page Directory
+
+    uint32_t dir_idx = (virtual_addr >> 22) & 0x3FF;  // bits 31-22
+    uint32_t tbl_idx = (virtual_addr >> 12) & 0x3FF;  // bits 21-12
+    uint32_t offset  = virtual_addr & 0xFFF;          // bits 11-0
+
+    pt_entry_t* pt = (pt_entry_t*) MMU_ENTRY_PADDR(pd[dir_idx]);
+    uint8_t* phys_page = (uint8_t*) MMU_ENTRY_PADDR(pt[tbl_idx]);
+
+    return (void*)(phys_page + offset);
+}
+🧪 Ejemplo de uso
+c
+Copiar
+Editar
+uint32_t cr3 = get_current_task_cr3(); // o el cr3 del kernel
+uint32_t vaddr = 0x07000000;
+
+uint8_t* ptr = (uint8_t*) mmu_get_phys_ptr(cr3, vaddr);
+uint8_t value = *ptr; // leer
+*ptr = 0xFF;  
+```
+https://docs.google.com/document/d/1j2fV9WGEdfMBcaU-gSZxLqo0OzWDIQ05SVzd28CebZM/edit?tab=t.0
